@@ -1,4 +1,5 @@
 # requirements.txt
 Textual
 minecraft_launcher_lib
+requests
 python 3.11.9

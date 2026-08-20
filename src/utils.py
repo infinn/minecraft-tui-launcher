@@ -4,13 +4,12 @@ import minecraft_launcher_lib
 import subprocess
 import socket
 
-from src.config import VERSION_LAUNCHER
 from src.Globals import Globals
 
 class MineManager:
     def __init__(self, user):
         self.MINECRAFT_DIRECTORY = f"C://Users//{user}//AppData//Roaming//.minecraft"
-        self.SRC_JSON = f"{self.MINECRAFT_DIRECTORY}//configuration.json"
+        self.SRC_JSON = f"{self.MINECRAFT_DIRECTORY}//configuration-launcher.json"
 
         self.configuration = {}
 
@@ -38,7 +37,7 @@ class MineManager:
             "defaultExecutablePath": "java",
             "jvmArguments": [],
             "launcherName": "infinn-launcher",
-            "launcherVersion": VERSION_LAUNCHER,
+            "launcherVersion": "1.0",
             "gameDirectory": self.MINECRAFT_DIRECTORY,
             "demo": False,
             "customResolution": False,
@@ -71,7 +70,7 @@ class MineManager:
     
     def set_minecrat_directory(self, path):
         self.MINECRAFT_DIRECTORY = path
-        self.SRC_JSON = f"{self.MINECRAFT_DIRECTORY}//configuration.json"
+        self.SRC_JSON = f"{self.MINECRAFT_DIRECTORY}//configuration-launcher.json"
 
     async def install_minecraft(self, version):
         minecraft_launcher_lib.install.install_minecraft_version(
@@ -91,7 +90,7 @@ def load_configuration():
     pass
 
 def _ensure_configuration_file():
-    json_path = f"{Globals.minecraftDir}//configuration.json"
+    json_path = f"{Globals.minecraftDir}//configuration-launcher.json"
 
     if not os.path.isfile(json_path):
         _create_default_file()
@@ -104,7 +103,7 @@ def _ensure_configuration_file():
 
 
 def _create_default_file():
-    json_path = f"{Globals.minecraftDir}//configuration.json"
+    json_path = f"{Globals.minecraftDir}//configuration-launcher.json"
     default_data = {
         "username": "",
         "uuid": "",
@@ -114,7 +113,7 @@ def _create_default_file():
         "defaultExecutablePath": "java",
         "jvmArguments": [],
         "launcherName": "infinn-launcher",
-        "launcherVersion": VERSION_LAUNCHER,
+        "launcherVersion": "1.0",
         "gameDirectory": Globals.minecraftDir,
         "demo": False,
         "customResolution": False,
@@ -143,19 +142,14 @@ def get_parse_version(versionList):
     return(parse_list)
 
 def update_cache(minecraft_dir, latest_version_usage):
-    data = {
-        "minecraftDir": minecraft_dir,
-        "latestVersionUsage": latest_version_usage
-    }
-
-    try:
-        with open(Globals.cacheFile, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4)
-    except Exception as e:
-            print("Error al guardar el cache:", e)
+    Globals.minecraftDir = minecraft_dir
+    Globals.lastVersion = latest_version_usage
+    Globals.save_cache()
 
 def play_minecraft(config):
     update_cache(Globals.minecraftDir, config["version"])
+    Globals.lastUsername = config["user"]
+    Globals.save_cache()
 
     options = {
         'username': config["user"],
@@ -163,7 +157,7 @@ def play_minecraft(config):
         'token': '',
             
         "launcherName": "infinn-launcher",
-        "launcherVersion": VERSION_LAUNCHER,
+        "launcherVersion": "1.0",
     }
 
     minecraft_command = minecraft_launcher_lib.command.get_minecraft_command(config["version"], Globals.minecraftDir, options)

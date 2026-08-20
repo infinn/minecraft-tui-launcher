@@ -82,7 +82,7 @@ class Profile:
         profile.serverPort = objects["serverPort"]
         profile.demoMode = objects["demoMode"]
         profile.disableMultiplayer = objects.get("disableMultiplayer", False)
-        profile.disableChat = objects.get("disableMultiplayer", False)
+        profile.disableChat = objects.get("disableChat", False)
         profile.hasMinecraftOptions = objects.get("hasMinecraftOptions", False)
         profile.minecraftOptions = objects.get("minecraftOptions", "")
         profile.useGameMode = objects.get("useGameMode", False)
@@ -101,3 +101,27 @@ class Profile:
             if isinstance(value, int) or isinstance(value, bool) or isinstance(value, str):
                 data[key] = value
         return data
+
+    @classmethod
+    def loadActiveFromCache(cls) -> "Profile | None":
+        if not Globals.profiles:
+            return None
+
+        active_id = Globals.lastProfile
+        for profile_data in Globals.profiles:
+            if profile_data.get("id") == active_id:
+                return cls.load(profile_data, 2)
+        return cls.load(Globals.profiles[0], 2)
+
+    def saveToCache(self):
+        profile_dict = self.toDict()
+        updated = False
+        for i, p in enumerate(Globals.profiles):
+            if p.get("id") == self.id:
+                Globals.profiles[i] = profile_dict
+                updated = True
+                break
+        if not updated:
+            Globals.profiles.append(profile_dict)
+        Globals.lastProfile = self.id
+        Globals.save_cache()

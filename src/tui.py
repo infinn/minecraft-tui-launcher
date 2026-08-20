@@ -5,15 +5,26 @@ from textual.containers import Horizontal, Vertical, CenterMiddle
 from textual.widgets import Footer, Label, Input, Select, Switch, Static, Button, Rule, Log, ProgressBar 
 from .core.version_collection import VersionUtils
 from src.Globals import Globals
+from src.utils import load_configuration
 
 class TUI(App):
     CSS_PATH = "tui.tcss"
+
+    def on_mount(self):
+        Globals.load_cache()
+        Globals.minecraftDir = Globals.minecraftDir or Globals.defaultMinecraftDir
+        load_configuration()
+
     def compose(self) -> ComposeResult:
         version_list = VersionUtils().getReleaseVersions()
+
+        username_value = Globals.lastUsername or Globals.userConfiguration.get("username", "")
+        version_value = Globals.lastVersion or Globals.userConfiguration.get("lastVersion", "")
+
         header_box = Vertical(
             Horizontal(
                 Label("Username"),
-                Input(placeholder="username", compact=True),
+                Input(placeholder="username", compact=True, value=username_value),
             ),
             Horizontal(
                 Label("Version"),
@@ -24,7 +35,7 @@ class TUI(App):
             ),
             Horizontal(
                 Label("Mc Directory"),
-                Label(Globals.defaultMinecraftDir),
+                Label(Globals.minecraftDir),
             ),
             classes="box"
         )
