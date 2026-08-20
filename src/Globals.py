@@ -13,6 +13,7 @@ class Globals:
 
     lastUsername = ""
     lastVersion = ""
+    javaPath = ""
     windowWidth = 80
     windowHeight = 24
     lastProfile = ""
@@ -34,6 +35,7 @@ class Globals:
         cls.minecraftDir = data.get("minecraftDir", cls.defaultMinecraftDir)
         cls.lastVersion = data.get("lastVersion", "")
         cls.lastUsername = data.get("lastUsername", "")
+        cls.javaPath = data.get("javaPath", "")
         cls.windowWidth = data.get("windowWidth", 80)
         cls.windowHeight = data.get("windowHeight", 24)
         cls.lastProfile = data.get("lastProfile", "")
@@ -46,6 +48,7 @@ class Globals:
             "minecraftDir": cls.minecraftDir,
             "lastVersion": cls.lastVersion,
             "lastUsername": cls.lastUsername,
+            "javaPath": cls.javaPath,
             "windowWidth": cls.windowWidth,
             "windowHeight": cls.windowHeight,
             "lastProfile": cls.lastProfile,
@@ -62,6 +65,7 @@ class Globals:
         cls.minecraftDir = cls.defaultMinecraftDir
         cls.lastVersion = ""
         cls.lastUsername = ""
+        cls.javaPath = ""
         cls.windowWidth = 80
         cls.windowHeight = 24
         cls.lastProfile = ""

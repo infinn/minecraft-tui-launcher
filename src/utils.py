@@ -1,10 +1,13 @@
 import json
 import os
+import shutil
 import minecraft_launcher_lib
 import subprocess
 import socket
 
 from src.Globals import Globals
+
+JAVA_DOWNLOAD_URL = "https://www.java.com/"
 
 class MineManager:
     def __init__(self, user):
@@ -184,4 +187,16 @@ def check_java_installed():
         return result.returncode == 0
     except FileNotFoundError:
         return False
+
+def get_java_path():
+    # devuelve la ruta del ejecutable de java, o "" si no se encuentra
+    java_path = minecraft_launcher_lib.utils.get_java_executable()
+    if java_path and os.path.isfile(java_path):
+        return java_path
+
+    which_path = shutil.which("java")
+    if which_path:
+        return which_path
+
+    return ""
     

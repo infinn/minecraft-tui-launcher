@@ -11,6 +11,14 @@ Horizontal{
     layout: grid;
     grid-size: 2;
 }
+Button{
+    margin: 0;
+}
+Log{
+    margin:0;
+    scrollbar-size-horizontal: 1;
+    scrollbar-size-vertical: 1;
+}
 .box{
     margin: 0 1;
     border: solid $primary;
@@ -21,5 +29,8 @@ Horizontal{
 }
 ProgressBar{
     width:100%;
-    column-span: 2;
+    column-span: 3;
+}
+#text{
+    color: $secondary
 }
