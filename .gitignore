@@ -1,0 +1,24 @@
+venv/
+.venv/
+env/
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# Archivos de sistema operativo y editores
+.DS_Store
+.idea/
+
+# Archivos de datos sensibles o generados
+*.log
+*.sqlite3
+
+main.spec
+
+build/*
+dist/*
+
+src/cache.json

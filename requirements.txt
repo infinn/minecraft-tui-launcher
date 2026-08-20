@@ -1,0 +1,3 @@
+# requirements.txt
+minecraft_launcher_lib
+python 3.11.9
