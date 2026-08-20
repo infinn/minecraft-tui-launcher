@@ -3,10 +3,13 @@ import os
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, CenterMiddle 
 from textual.widgets import Footer, Label, Input, Select, Switch, Static, Button, Rule, Log, ProgressBar 
+from .core.version_collection import VersionUtils
+from src.Globals import Globals
 
 class TUI(App):
     CSS_PATH = "tui.tcss"
     def compose(self) -> ComposeResult:
+        version_list = VersionUtils().getReleaseVersions()
         header_box = Vertical(
             Horizontal(
                 Label("Username"),
@@ -15,13 +18,13 @@ class TUI(App):
             Horizontal(
                 Label("Version"),
                 Select(
-                    [("First", 1), ("Second", 2)],
+                    version_list,
                     compact=True
                 ),
             ),
             Horizontal(
                 Label("Mc Directory"),
-                Label(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+                Label(Globals.defaultMinecraftDir),
             ),
             classes="box"
         )

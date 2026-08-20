@@ -69,10 +69,23 @@ class VersionUtils:
         self._versions = _versions
 
     def getVersionList(self):
-        return list(self._versions.values())
+        return [
+            (version["id"], index)
+            for index, version in enumerate(self._versions.values(), start=1)
+        ]
 
     def getInstalledVersions(self):
-        return list(self._installedVersions.values())
+        return [
+            (version["id"], index)
+            for index, version in enumerate(self._installedVersions.values(), start=1)
+        ]
+
+    def getReleaseVersions(self):
+        return [
+            (version["id"], index)
+            for index, version in enumerate(self._versions.values(), start=1)
+            if version["type"] == "release"
+        ]
 
     def getLatestRelease(self):
         return self._latestRelease
