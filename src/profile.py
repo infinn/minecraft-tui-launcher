@@ -1,8 +1,17 @@
 import minecraft_launcher_lib
 
-from .core.version_collection import version_collection
+from .core.version_collection import VersionUtils
 from src.Globals import Globals
 from typing import Type
+
+_version_utils = None
+
+
+def _get_version_utils() -> "VersionUtils":
+    global _version_utils
+    if _version_utils is None:
+        _version_utils = VersionUtils()
+    return _version_utils
 
 
 class Profile:
@@ -36,9 +45,9 @@ class Profile:
 
     def getVersionID(self) -> str:
         if self.useLatestVersion:
-            return version_collection.getInstance().getLatestRelease()
+            return _get_version_utils().getLatestRelease()
         elif self.useLatestSnapshot:
-            return version_collection.getInstance().getLatestSnapshot()
+            return _get_version_utils().getLatestSnapshot()
         else:
             return self.version
 

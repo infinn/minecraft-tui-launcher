@@ -4,8 +4,14 @@ import getpass
 
 class Globals:
     programDir = os.path.dirname(os.path.abspath(__file__))
+
+    if os.name == "nt":
+        _home = os.environ.get("APPDATA") or os.path.expanduser("~")
+    else:
+        _home = os.path.expanduser("~")
+    defaultMinecraftDir = os.path.join(_home, ".minecraft")
+
     minecraftDir = ""
-    defaultMinecraftDir = f"C://Users//{getpass.getuser()}//AppData//Roaming//.minecraft"
     firstLaunch = True
     cacheFile = os.path.join(programDir, "cache.json")
     userConfiguration = {}
