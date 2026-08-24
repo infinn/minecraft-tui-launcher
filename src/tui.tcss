@@ -34,3 +34,6 @@ ProgressBar{
 #text{
     color: $secondary
 }
+#buttons-secction {
+    height: 5;
+}

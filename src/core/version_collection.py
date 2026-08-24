@@ -19,8 +19,16 @@ class VersionUtils:
         self.updateVersion()
 
     def _load_vanilla_version(self):
-        _version_data = requests.get("https://launchermeta.mojang.com/mc/game/version_manifest_v2.json").json()
-        
+        try:
+            _version_data = requests.get(
+                "https://launchermeta.mojang.com/mc/game/version_manifest_v2.json",
+                timeout=10,
+            ).json()
+        except Exception:
+            self._latestRelease = ""
+            self._latestSnapshot = ""
+            return
+
         self._latestRelease = _version_data["latest"]["release"]
         self._latestSnapshot = _version_data["latest"]["snapshot"]
 
