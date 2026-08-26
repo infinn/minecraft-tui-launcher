@@ -54,7 +54,10 @@ class TUI(App):
             State.set_username(event.value.strip())
 
     def on_switch_changed(self, event: Switch.Changed):
-        State.set_snapshots(event.value)
+        if event.switch.id == "local-switch":
+            State.set_local(event.value)
+        else:
+            State.set_snapshots(event.value)
         self._refresh_version_select()
 
     # --- Botones ---
@@ -233,27 +236,38 @@ class LauncherHeader(Vertical):
             version_value = State.selected_version if State.selected_version in [v[1] for v in State.version_options] else State.version_options[0][1]
             yield Horizontal(
                 Label("Version", id="text"),
-                Select(State.version_options, value=version_value, compact=True, id="version-select"),
+                Vertical(
+                    Select(State.version_options, value=version_value, compact=True, id="version-select"),
+                    Horizontal(
+                        Label("Snapshots", id="text"),
+                        Switch(value=State.show_snapshots, id="snapshot-switch"),
+                        classes="switch-row",
+                    ),
+                    Horizontal(
+                        Label("Local", id="text"),
+                        Switch(value=State.show_local, id="local-switch"),
+                        classes="switch-row",
+                    ),
+                ),
+                classes="version-section"
             )
         else:
             yield Horizontal(
                 Label("Version", id="text"),
                 Select([("no versions", "none")], value="none", compact=True, id="version-select"),
+                classes="version-section"
             )
 
         yield Horizontal(
             Label("Mc Directory", id="text"),
             Label(State.minecraft_dir, id="mc-dir-label"),
         )
-        yield Horizontal(
-            Label("Snapshots", id="text"),
-            Switch(value=State.show_snapshots, id="snapshot-switch"),
-        )
 
 
 class LauncherStatus(Vertical):
     def on_mount(self):
         self.classes = "box"
+        self.id = "launcher-status"
 
     def compose(self) -> ComposeResult:
         yield Horizontal(
@@ -280,6 +294,7 @@ class LauncherLog(Vertical):
     def on_mount(self):
         self.border_title = "log"
         self.classes = "box"
+        self.id = "log-section"
 
     def compose(self) -> ComposeResult:
         yield Log(id="log", auto_scroll=True)

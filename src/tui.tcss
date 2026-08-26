@@ -6,6 +6,7 @@ Label{
 }
 Input{
     width: 100%;
+    padding: 0;
 }
 Horizontal{
     layout: grid;
@@ -18,11 +19,12 @@ Log{
     margin:0;
     scrollbar-size-horizontal: 1;
     scrollbar-size-vertical: 1;
+    height: 100%;
 }
 .box{
     margin: 0 1;
     border: solid $primary;
-    padding: 2 2 2 2;
+    padding: 1 1 1 1;
 }
 .box Horizontal{
     grid-columns: 1fr 3fr
@@ -33,6 +35,38 @@ ProgressBar{
 }
 #text{
     color: $secondary
+}
+.box .switch-row {
+    layout: horizontal;
+    height: 3;
+    align: left middle;
+    border: none;
+    padding: 0;
+}
+.box .switch-row > Label {
+    width: auto;
+}
+.box .switch-row > Switch {
+    margin-left: 1;
+    background: $boost;
+}
+.box .switch-row > Switch > .switch--slider {
+    color: $panel;
+    background: $panel-darken-2;
+}
+.box .switch-row > Switch.-on > .switch--slider {
+    color: $success;
+    background: $panel-darken-2;
+}
+#launcher-status{
+    height:10;
+}
+.version-section{
+    height:8;
+}
+#log-section{
+    height:8;
+    padding:0;
 }
 #buttons-secction {
     height: 5;
