@@ -1,5 +1,6 @@
 Screen{
-    layout: vertical;
+    align: center middle;
+    padding: 1 1 1 1;
 }
 Label{
     width: auto;
@@ -23,8 +24,10 @@ Log{
 }
 .box{
     margin: 0 1;
-    border: solid $primary;
+    border: solid $secondary;
     padding: 1 1 1 1;
+    background: $panel;
+    width: 70;
 }
 .box Horizontal{
     grid-columns: 1fr 3fr
@@ -70,4 +73,9 @@ ProgressBar{
 }
 #buttons-secction {
     height: 5;
+    width:70;
+}
+#mc-dir-label{
+    color:$secondary;
+    background: $secondary-muted;
 }

@@ -64,7 +64,7 @@ class Globals:
             with open(cls.cacheFile, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
         except OSError as e:
-            print("Error al guardar el cache:", e)
+            print("Error saving cache:", e)
 
     @classmethod
     def _create_default_cache(cls):

@@ -23,16 +23,16 @@ class TUI(App):
 
     def on_mount(self):
         log = self.query_one("#log", Log)
-
+        self.theme = "gruvbox"
         if not State.internet:
-            log.write("Sin conexion a internet. Algunas funciones no estaran disponibles.")
-            self.notify("Sin conexion a internet", severity="warning", timeout=8)
+            log.write("No internet connection. Some features will be unavailable.")
+            self.notify("No internet connection", severity="warning", timeout=8)
 
         if State.java_status == "missing":
             log.write(f"No java installed. Download it from: {JAVA_DOWNLOAD_URL}")
             self.notify("No java installed. Download", severity="error", timeout=10)
         else:
-            log.write(f"Java detectado: {State.java_path or 'PATH'}")
+            log.write(f"Java detected: {State.java_path or 'PATH'}")
 
         self._update_operation_state()
 
@@ -43,7 +43,7 @@ class TUI(App):
         yield LauncherLog()
         yield Footer()
 
-    # --- Selectores / inputs ---
+    # --- Selectors / inputs ---
     def on_select_changed(self, event: Select.Changed):
         if event.value is None or event.value is Select.NULL or event.value is Select.BLANK:
             return
@@ -60,29 +60,29 @@ class TUI(App):
             State.set_snapshots(event.value)
         self._refresh_version_select()
 
-    # --- Botones ---
+    # --- Buttons ---
     def on_button_pressed(self, event: Button.Pressed):
         if event.button.id == "download-button":
             self._start_download()
         elif event.button.id == "launch-button":
             self._start_launch()
 
-    # --- Descarga ---
+    # --- Download ---
     def _start_download(self):
         if State.is_busy():
             return
         version = State.selected_version
         if not version:
-            self.notify("Selecciona una version", severity="warning")
+            self.notify("Select a version", severity="warning")
             return
         if not State.internet:
-            self.notify("No hay conexion a internet", severity="error")
+            self.notify("No internet connection", severity="error")
             return
 
         State.operation = "downloading"
         State.progress = 0
         State.progress_max = 0
-        self.query_one("#log", Log).write_line(f"Descargando Minecraft {version}...")
+        self.query_one("#log", Log).write_line(f"Downloading Minecraft {version}...")
         self._update_operation_state()
 
         def cb_status(status):
@@ -118,8 +118,8 @@ class TUI(App):
         State.progress = 0
         State.progress_max = 0
         self.query_one(ProgressBar).update(progress=0, total=1)
-        self.query_one("#log", Log).write("Descarga completada.")
-        self.notify("Descarga completada", severity="information")
+        self.query_one("#log", Log).write("Download complete.")
+        self.notify("Download complete", severity="information")
         State.version_utils.updateVersion()
         State.refresh_versions()
         self._refresh_version_select()
@@ -129,31 +129,31 @@ class TUI(App):
         State.operation = "idle"
         self.query_one("#status-label", Label).update("[bold $error]download failed[/]")
         self.query_one("#details-label", Label).update(error[:120])
-        self.query_one("#log", Log).write(f"Error de descarga: {error}")
-        self.notify("Descarga fallida", severity="error")
+        self.query_one("#log", Log).write(f"Download error: {error}")
+        self.notify("Download failed", severity="error")
         self._update_operation_state()
 
-    # --- Lanzamiento ---
+    # --- Launch ---
     def _start_launch(self):
         if State.is_busy():
             return
         if State.java_status != "ready":
-            self.notify("Java no disponible", severity="error")
+            self.notify("Java unavailable", severity="error")
             return
         version = State.selected_version
         username = self.query_one("#username-input", Input).value.strip() or State.username
         if not version:
-            self.notify("Selecciona una version", severity="warning")
+            self.notify("Select a version", severity="warning")
             return
         if not username:
-            self.notify("Ingresa un nombre de usuario", severity="warning")
+            self.notify("Enter a username", severity="warning")
             return
 
         State.set_username(username)
         State.set_selected_version(version)
 
         State.operation = "launching"
-        self.query_one("#log", Log).write(f"Lanzando Minecraft {version} como {username}...")
+        self.query_one("#log", Log).write(f"Launching Minecraft {version} as {username}...")
         self._update_operation_state()
 
         def worker():
@@ -168,18 +168,18 @@ class TUI(App):
 
     def _launch_done(self):
         State.operation = "idle"
-        self.query_one("#log", Log).write("Juego cerrado.")
+        self.query_one("#log", Log).write("Game closed.")
         self._update_operation_state()
 
     def _launch_failed(self, error):
         State.operation = "idle"
         self.query_one("#status-label", Label).update("[bold $error]launch failed[/]")
         self.query_one("#details-label", Label).update(error[:120])
-        self.query_one("#log", Log).write(f"Error al lanzar: {error}")
-        self.notify("No se pudo lanzar el juego", severity="error")
+        self.query_one("#log", Log).write(f"Launch error: {error}")
+        self.notify("Could not launch the game", severity="error")
         self._update_operation_state()
 
-    # --- Helpers de UI ---
+    # --- UI helpers ---
     def _set_status(self, status, details=None):
         self.query_one("#status-label", Label).update(status)
         if details is not None:
