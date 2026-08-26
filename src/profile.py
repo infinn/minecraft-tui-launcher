@@ -4,15 +4,6 @@ from .core.version_collection import VersionUtils
 from src.Globals import Globals
 from typing import Type
 
-_version_utils = None
-
-
-def _get_version_utils() -> "VersionUtils":
-    global _version_utils
-    if _version_utils is None:
-        _version_utils = VersionUtils()
-    return _version_utils
-
 
 class Profile:
     def __init__(self, id:str, name:str):
@@ -45,9 +36,9 @@ class Profile:
 
     def getVersionID(self) -> str:
         if self.useLatestVersion:
-            return _get_version_utils().getLatestRelease()
+            return VersionUtils().getLatestRelease()
         elif self.useLatestSnapshot:
-            return _get_version_utils().getLatestSnapshot()
+            return VersionUtils().getLatestSnapshot()
         else:
             return self.version
 

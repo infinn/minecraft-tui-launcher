@@ -82,10 +82,11 @@ class VersionUtils:
             for index, version in enumerate(self._versions.values(), start=1)
         ]
 
-    def getInstalledVersions(self):
+    def getInstalledVersions(self, snapshots: bool = True):
         return [
             (version["id"], index)
             for index, version in enumerate(self._installedVersions.values(), start=1)
+            if snapshots or version["type"] == "release"
         ]
 
     def getReleaseVersions(self):

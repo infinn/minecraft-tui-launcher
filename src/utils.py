@@ -61,13 +61,6 @@ def _ensureMinecraftDirectoryExists():
         _ensureMinecraftDirectoryExists()
 
 
-def get_parse_version(versionList):
-    parse_list = []
-    for version in versionList:
-        parse_list.append(version["id"] + f' ({version["type"]})')
-    return parse_list
-
-
 def update_cache(minecraft_dir, latest_version_usage):
     Globals.minecraftDir = minecraft_dir
     Globals.lastVersion = latest_version_usage

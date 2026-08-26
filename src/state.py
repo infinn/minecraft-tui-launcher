@@ -11,6 +11,7 @@ class State:
 
     version_utils: "VersionUtils" = None
     show_snapshots: bool = False
+    show_local: bool = False
     version_options: list = []
     selected_version: str = ""
 
@@ -45,7 +46,9 @@ class State:
             cls.version_options = []
             return
 
-        if cls.show_snapshots:
+        if cls.show_local:
+            versions = cls.version_utils.getInstalledVersions(cls.show_snapshots)
+        elif cls.show_snapshots:
             versions = cls.version_utils.getVersionList()
         else:
             versions = cls.version_utils.getReleaseVersions()
@@ -66,6 +69,11 @@ class State:
         cls.refresh_versions()
         if current in [v[1] for v in cls.version_options]:
             cls.selected_version = current
+
+    @classmethod
+    def set_local(cls, enabled: bool):
+        cls.show_local = enabled
+        cls.refresh_versions()
 
     @classmethod
     def set_username(cls, username: str):
