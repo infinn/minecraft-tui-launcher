@@ -22,3 +22,5 @@ build/*
 dist/*
 
 src/cache.json
+
+logs/*

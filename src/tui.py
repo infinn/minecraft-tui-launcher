@@ -20,19 +20,21 @@ class TUI(App):
         Globals.minecraftDir = Globals.minecraftDir or Globals.defaultMinecraftDir
         load_configuration()
         State.initialize()
+        self._pulse_timer = None
+        self._pulse_progress = 0
 
     def on_mount(self):
         log = self.query_one("#log", Log)
         self.theme = "gruvbox"
         if not State.internet:
-            log.write("No internet connection. Some features will be unavailable.")
+            log.write_line("No internet connection. Some features will be unavailable.")
             self.notify("No internet connection", severity="warning", timeout=8)
 
         if State.java_status == "missing":
-            log.write(f"No java installed. Download it from: {JAVA_DOWNLOAD_URL}")
+            log.write_line(f"No java installed. Download it from: {JAVA_DOWNLOAD_URL}")
             self.notify("No java installed. Download", severity="error", timeout=10)
         else:
-            log.write(f"Java detected: {State.java_path or 'PATH'}")
+            log.write_line(f"Java detected: {State.java_path or 'PATH'}")
 
         self._update_operation_state()
 
@@ -118,7 +120,7 @@ class TUI(App):
         State.progress = 0
         State.progress_max = 0
         self.query_one(ProgressBar).update(progress=0, total=1)
-        self.query_one("#log", Log).write("Download complete.")
+        self.query_one("#log", Log).write_line("Download complete.")
         self.notify("Download complete", severity="information")
         State.version_utils.updateVersion()
         State.refresh_versions()
@@ -127,11 +129,13 @@ class TUI(App):
 
     def _download_failed(self, error):
         State.operation = "idle"
+        self._stop_pulse()
+        self.query_one(ProgressBar).update(progress=0, total=1)
         self.query_one("#status-label", Label).update("[bold $error]download failed[/]")
         self.query_one("#details-label", Label).update(error[:120])
-        self.query_one("#log", Log).write(f"Download error: {error}")
+        self.query_one("#log", Log).write_line(f"Download error: {error}")
         self.notify("Download failed", severity="error")
-        self._update_operation_state()
+        self._update_buttons()
 
     # --- Launch ---
     def _start_launch(self):
@@ -153,8 +157,9 @@ class TUI(App):
         State.set_selected_version(version)
 
         State.operation = "launching"
-        self.query_one("#log", Log).write(f"Launching Minecraft {version} as {username}...")
+        self.query_one("#log", Log).write_line(f"Launching Minecraft {version} as {username}...")
         self._update_operation_state()
+        self._start_pulse()
 
         def worker():
             try:
@@ -168,16 +173,20 @@ class TUI(App):
 
     def _launch_done(self):
         State.operation = "idle"
-        self.query_one("#log", Log).write("Game closed.")
+        self._stop_pulse()
+        self.query_one(ProgressBar).update(progress=0, total=1)
+        self.query_one("#log", Log).write_line("Game closed.")
         self._update_operation_state()
 
     def _launch_failed(self, error):
         State.operation = "idle"
+        self._stop_pulse()
+        self.query_one(ProgressBar).update(progress=0, total=1)
         self.query_one("#status-label", Label).update("[bold $error]launch failed[/]")
         self.query_one("#details-label", Label).update(error[:120])
-        self.query_one("#log", Log).write(f"Launch error: {error}")
+        self.query_one("#log", Log).write_line(f"Launch error: {error}")
         self.notify("Could not launch the game", severity="error")
-        self._update_operation_state()
+        self._update_buttons()
 
     # --- UI helpers ---
     def _set_status(self, status, details=None):
@@ -206,19 +215,44 @@ class TUI(App):
                 pass
 
     def _update_operation_state(self):
+        self._update_buttons()
+        self._update_status_labels()
+
+    def _update_buttons(self):
         busy = State.is_busy()
         self.query_one("#download-button", Button).disabled = busy
         self.query_one("#launch-button", Button).disabled = busy or State.java_status != "ready"
 
+    def _update_status_labels(self):
         status = self.query_one("#status-label", Label)
+        details = self.query_one("#details-label", Label)
         if State.operation == "downloading":
             status.update("[bold $accent]downloading...[/]")
+            details.update("Fetching game files from Mojang...")
         elif State.operation == "launching":
             status.update("[bold $accent]launching...[/]")
+            details.update(f"Starting Minecraft {State.selected_version}...")
         elif State.java_status == "ready":
             status.update("[bold $success]ready[/]")
+            details.update("Ready to play. Select a version and launch.")
         else:
             status.update("[bold $warning]Missing java[/]")
+            details.update("Install Java to enable launching.")
+
+    def _start_pulse(self):
+        self._pulse_progress = 0
+        self.query_one(ProgressBar).update(total=100, progress=0)
+        if self._pulse_timer is None:
+            self._pulse_timer = self.set_interval(0.08, self._tick_pulse)
+
+    def _tick_pulse(self):
+        self._pulse_progress = (self._pulse_progress + 4) % 100
+        self.query_one(ProgressBar).update(total=100, progress=self._pulse_progress)
+
+    def _stop_pulse(self):
+        if self._pulse_timer is not None:
+            self._pulse_timer.stop()
+            self._pulse_timer = None
 
 
 class LauncherHeader(Vertical):
